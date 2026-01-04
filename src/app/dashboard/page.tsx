@@ -1,10 +1,12 @@
+"use client";
+
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Leaf, Wind, BarChart, Clock, Droplets, Thermometer } from "lucide-react";
 import { generateSensorData, getTotalCO2Absorbed, generateDailyAbsorption, mockGreonUnits } from "@/lib/data";
 import { LineChartComponent, GaugeComponent } from "@/components/dashboard/charts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Bar, BarChart as BarChartRecharts, XAxis, YAxis } from "recharts";
+import { Bar, BarChart as BarChartRecharts, CartesianGrid, XAxis, YAxis } from "recharts";
 
 export default function DashboardPage() {
     const sensorData = generateSensorData(1); // Last 24 hours
