@@ -11,6 +11,18 @@
       "description": "Avatar for a user.",
       "imageUrl": "https://images.unsplash.com/photo-1590086782792-42dd2350140d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3Njc1MTExMDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
+    },
+    {
+      "id": "unit-living-room",
+      "description": "An image of a GREON unit in a living room setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1631679706909-1844bbd07221?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxsaXZpbmclMjByb29tfGVufDB8fHx8MTc2NzUxMTYxM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "living room"
+    },
+    {
+      "id": "unit-bedroom",
+      "description": "An image of a GREON unit in a bedroom setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxiZWRyb29tfGVufDB8fHx8MTc2NzQ5Mjc1M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bedroom"
     }
   ]
 }
