@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Leaf } from 'lucide-react';
 
 const PARTICLE_COUNT = 150;
