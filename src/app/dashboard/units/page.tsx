@@ -1,3 +1,6 @@
+
+'use client';
+
 import {
   Card,
   CardContent,
@@ -11,6 +14,10 @@ import { Button } from "@/components/ui/button"
 import { mockGreonUnits, mockUsers } from "@/lib/data"
 import Image from "next/image"
 import { PlaceHolderImages } from "@/lib/placeholder-images"
+import { RegisterUnitForm } from "@/components/dashboard/register-unit-form";
+import { useState } from "react";
+import type { GreonUnit } from "@/lib/types";
+import { format, addMonths } from "date-fns";
 
 
 const statusVariantMap: { [key: string]: "default" | "secondary" | "destructive" } = {
@@ -21,7 +28,8 @@ const statusVariantMap: { [key: string]: "default" | "secondary" | "destructive"
 
 export default function UserUnitsPage() {
     const user = mockUsers[0];
-    const userUnits = mockGreonUnits.filter(unit => unit.ownerId === user.id);
+    // Use state to manage units so we can update it
+    const [userUnits, setUserUnits] = useState(() => mockGreonUnits.filter(unit => unit.ownerId === user.id));
 
     const unitImages: { [key: string]: string } = {
       'Living Room Purifier': 'unit-living-room',
@@ -29,12 +37,31 @@ export default function UserUnitsPage() {
       'Office Unit': 'unit-office',
     }
 
+    const handleRegisterUnit = (data: { unitId: string; name: string; location: string }) => {
+      const newUnit: GreonUnit = {
+        id: data.unitId,
+        name: data.name,
+        location: data.location,
+        status: 'Active',
+        installationDate: format(new Date(), 'yyyy-MM-dd'),
+        nextAlgaeReplacement: format(addMonths(new Date(), 6), 'yyyy-MM-dd'),
+        efficiency: 100,
+        uptime: 100,
+        ownerId: user.id,
+      };
+
+      // In a real app, this would be an API call.
+      // Here, we just update the local state.
+      setUserUnits(prevUnits => [...prevUnits, newUnit]);
+      mockGreonUnits.push(newUnit); // Also push to mock data if other pages need it
+    };
+
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">My GREON Units</h1>
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
         {userUnits.map(unit => {
-          const imageId = unitImages[unit.name];
+          const imageId = unitImages[unit.name] || 'unit-office'; // fallback image
           const image = PlaceHolderImages.find(p => p.id === imageId);
 
           return (
@@ -91,7 +118,7 @@ export default function UserUnitsPage() {
                 <CardDescription>Register a new GREON unit to your account.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Button className="w-full">Register Unit</Button>
+                <RegisterUnitForm onRegister={handleRegisterUnit} />
             </CardContent>
         </Card>
       </div>
