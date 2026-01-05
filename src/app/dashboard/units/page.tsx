@@ -26,6 +26,7 @@ export default function UserUnitsPage() {
     const unitImages: { [key: string]: string } = {
       'Living Room Purifier': 'unit-living-room',
       'Bedroom Purifier': 'unit-bedroom',
+      'Office Unit': 'unit-office',
     }
 
   return (
@@ -39,7 +40,7 @@ export default function UserUnitsPage() {
           return (
             <Card key={unit.id} className="overflow-hidden">
                 {image && (
-                    <div className="relative aspect-video">
+                    <div className="relative aspect-[1.618/1]">
                         <Image
                             src={image.imageUrl}
                             alt={image.description}
