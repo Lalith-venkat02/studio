@@ -34,6 +34,7 @@ export function InteractiveExplanation() {
     setParticles(initialParticles);
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (!container) return;
       const rect = container.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
@@ -41,7 +42,7 @@ export function InteractiveExplanation() {
       setParticles(prevParticles =>
         prevParticles.map(p => {
           const particleEl = document.getElementById(`particle-${p.id}`);
-          if (!particleEl) return p;
+          if (!particleEl) return { ...p, state: 'co2' };
 
           const particleRect = particleEl.getBoundingClientRect();
           const particleX = particleRect.left - rect.left + particleRect.width / 2;
@@ -54,7 +55,8 @@ export function InteractiveExplanation() {
           if (distance < INTERACTION_RADIUS) {
             return { ...p, state: 'o2' };
           }
-          return p;
+          // Revert to co2 if not in radius
+          return { ...p, state: 'co2' };
         })
       );
     };
@@ -62,7 +64,9 @@ export function InteractiveExplanation() {
     container.addEventListener('mousemove', handleMouseMove);
 
     return () => {
-      container.removeEventListener('mousemove', handleMouseMove);
+      if (container) {
+        container.removeEventListener('mousemove', handleMouseMove);
+      }
     };
   }, []);
 
@@ -102,7 +106,7 @@ export function InteractiveExplanation() {
                 key={particle.id}
                 id={`particle-${particle.id}`}
                 className={cn(
-                  'absolute h-1.5 w-1.5 rounded-full transition-colors duration-500',
+                  'absolute h-1.5 w-1.5 rounded-full transition-colors duration-200',
                   particle.state === 'co2' ? 'bg-destructive/70' : 'bg-primary/80'
                 )}
                 style={{
