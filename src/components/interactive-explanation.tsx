@@ -1,21 +1,63 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Leaf } from 'lucide-react';
+
+const PARTICLE_COUNT = 150;
+const REPULSION_RADIUS = 100;
+const REPULSION_STRENGTH = 1.5;
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  ref: React.RefObject<HTMLDivElement>;
+}
 
 export function InteractiveExplanation() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
+    const newParticles: Particle[] = Array.from({ length: PARTICLE_COUNT }).map((_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        ref: React.createRef<HTMLDivElement>(),
+    }));
+    setParticles(newParticles);
+
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      container.style.setProperty('--mouse-x', `${x}px`);
-      container.style.setProperty('--mouse-y', `${y}px`);
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      newParticles.forEach((p) => {
+        if (!p.ref.current) return;
+
+        const particleRect = p.ref.current.getBoundingClientRect();
+        const particleX = particleRect.left - rect.left + particleRect.width / 2;
+        const particleY = particleRect.top - rect.top + particleRect.height / 2;
+
+        const dx = particleX - mouseX;
+        const dy = particleY - mouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < REPULSION_RADIUS) {
+          const force = (REPULSION_RADIUS - distance) / REPULSION_RADIUS;
+          const moveX = (dx / distance) * force * REPULSION_STRENGTH * 50;
+          const moveY = (dy / distance) * force * REPULSION_STRENGTH * 50;
+          
+          p.ref.current.style.transform = `translate(${moveX}px, ${moveY}px)`;
+          p.ref.current.style.opacity = '0';
+        } else {
+          p.ref.current.style.transform = 'translate(0, 0)';
+           p.ref.current.style.opacity = '1';
+        }
+      });
     };
 
     container.addEventListener('mousemove', handleMouseMove);
@@ -47,17 +89,19 @@ export function InteractiveExplanation() {
             ref={containerRef}
             className="group relative h-[400px] w-full overflow-hidden rounded-xl border-2 border-primary/20 bg-background p-4 [mask-image:linear-gradient(to_bottom,white,white)]"
           >
-            <div
-              className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-              style={{
-                background:
-                  'radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), hsla(var(--primary), 0.1), transparent 80%)',
-              }}
-            />
-            <div
-              className="absolute inset-0 bg-dot-pattern opacity-40"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
+             {particles.map((particle) => (
+              <div
+                key={particle.id}
+                ref={particle.ref}
+                className="absolute h-1.5 w-1.5 rounded-full bg-muted-foreground/50 transition-transform duration-300 ease-out group-hover:transition-opacity"
+                style={{
+                  left: `${particle.x}%`,
+                  top: `${particle.y}%`,
+                  transitionProperty: 'transform, opacity',
+                }}
+              />
+            ))}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="flex items-center text-lg text-muted-foreground transition-opacity duration-500 group-hover:opacity-0">
                   <Leaf className="mr-2 h-5 w-5" />
                   Move your cursor here to start purifying
@@ -69,14 +113,3 @@ export function InteractiveExplanation() {
     </section>
   );
 }
-
-const DotPattern = () => (
-    <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <pattern id="dot-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
-            <circle cx="10" cy="10" r="1.5" className="fill-muted-foreground/60" />
-            </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#dot-pattern)" />
-    </svg>
-);
