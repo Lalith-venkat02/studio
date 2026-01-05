@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import GreonLogo from '@/components/greon-logo';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ArrowRight } from 'lucide-react';
+import { InteractiveExplanation } from '@/components/interactive-explanation';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'hero-image');
@@ -57,6 +58,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <InteractiveExplanation />
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-muted-foreground">&copy; 2024 GREON Inc. All rights reserved.</p>
