@@ -8,7 +8,8 @@ import { cn } from '@/lib/utils';
 
 const PARTICLE_COUNT = 300;
 const INTERACTION_RADIUS = 80;
-const REPULSION_STRENGTH = 0.02;
+const REPULSION_STRENGTH = 0.02; // For CO2 particles
+const ATTRACTION_STRENGTH = 0.01; // For O2 particles
 
 interface Particle {
   id: number;
@@ -61,8 +62,14 @@ export function InteractiveExplanation() {
                         const forceDirectionX = dx / distance;
                         const forceDirectionY = dy / distance;
                         const force = (INTERACTION_RADIUS - distance) / INTERACTION_RADIUS;
-                        newVx += forceDirectionX * force * REPULSION_STRENGTH;
-                        newVy += forceDirectionY * force * REPULSION_STRENGTH;
+
+                        if (p.state === 'co2') { // Repel red particles
+                            newVx += forceDirectionX * force * REPULSION_STRENGTH;
+                            newVy += forceDirectionY * force * REPULSION_STRENGTH;
+                        } else { // Attract green particles
+                            newVx -= forceDirectionX * force * ATTRACTION_STRENGTH;
+                            newVy -= forceDirectionY * force * ATTRACTION_STRENGTH;
+                        }
                     }
                 }
                 
@@ -103,7 +110,7 @@ export function InteractiveExplanation() {
           if (distance < INTERACTION_RADIUS) {
             return { ...p, state: 'o2' };
           }
-          return { ...p, state: 'co2' };
+          return p;
         })
       );
     };
