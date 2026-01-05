@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Leaf } from 'lucide-react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const PARTICLE_COUNT = 150;
 const REPULSION_RADIUS = 100;
@@ -17,6 +19,8 @@ interface Particle {
 export function InteractiveExplanation() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [particles, setParticles] = useState<Particle[]>([]);
+  const purificationImage = PlaceHolderImages.find(p => p.id === 'purification-cycle');
+
 
   useEffect(() => {
     const container = containerRef.current;
@@ -89,11 +93,20 @@ export function InteractiveExplanation() {
             ref={containerRef}
             className="group relative h-[400px] w-full overflow-hidden rounded-xl border-2 border-primary/20 bg-background p-4 [mask-image:linear-gradient(to_bottom,white,white)]"
           >
+             {purificationImage && (
+              <Image
+                src={purificationImage.imageUrl}
+                alt={purificationImage.description}
+                data-ai-hint={purificationImage.imageHint}
+                fill
+                className="object-contain object-center opacity-10"
+              />
+            )}
              {particles.map((particle) => (
               <div
                 key={particle.id}
                 ref={particle.ref}
-                className="absolute h-1.5 w-1.5 rounded-full bg-muted-foreground/50 transition-transform duration-300 ease-out group-hover:transition-opacity"
+                className="absolute h-1 w-1 rounded-full bg-gray-400 transition-transform duration-300 ease-out group-hover:transition-opacity"
                 style={{
                   left: `${particle.x}%`,
                   top: `${particle.y}%`,
