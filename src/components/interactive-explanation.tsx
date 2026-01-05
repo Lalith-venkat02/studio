@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 const PARTICLE_COUNT = 300;
 const INTERACTION_RADIUS = 80;
+const REPULSION_STRENGTH = 0.02;
 
 interface Particle {
   id: number;
@@ -23,6 +24,7 @@ export function InteractiveExplanation() {
   const [particles, setParticles] = useState<Particle[]>([]);
   const purificationImage = PlaceHolderImages.find(p => p.id === 'purification-cycle');
   const animationFrameId = useRef<number>();
+  const mousePosition = useRef<{ x: number | null; y: number | null }>({ x: null, y: null });
 
   useEffect(() => {
     const container = containerRef.current;
@@ -39,19 +41,48 @@ export function InteractiveExplanation() {
     setParticles(initialParticles);
 
     const animateParticles = () => {
-        setParticles(prevParticles => 
-            prevParticles.map(p => {
-                let newX = p.x + p.vx;
-                let newY = p.y + p.vy;
+        setParticles(prevParticles => {
+            const containerRect = container?.getBoundingClientRect();
+            const mouseX = mousePosition.current.x;
+            const mouseY = mousePosition.current.y;
+            
+            return prevParticles.map(p => {
                 let newVx = p.vx;
                 let newVy = p.vy;
 
-                if (newX <= 0 || newX >= 100) newVx = -newVx;
-                if (newY <= 0 || newY >= 100) newVy = -newVy;
+                if (mouseX !== null && mouseY !== null && containerRect) {
+                    const particlePxX = (p.x / 100) * containerRect.width;
+                    const particlePxY = (p.y / 100) * containerRect.height;
+                    const dx = particlePxX - mouseX;
+                    const dy = particlePxY - mouseY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < INTERACTION_RADIUS) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (INTERACTION_RADIUS - distance) / INTERACTION_RADIUS;
+                        newVx += forceDirectionX * force * REPULSION_STRENGTH;
+                        newVy += forceDirectionY * force * REPULSION_STRENGTH;
+                    }
+                }
+                
+                let newX = p.x + newVx;
+                let newY = p.y + newVy;
+
+                if (newX <= 0 || newX >= 100) newVx = -newVx * 0.8;
+                if (newY <= 0 || newY >= 100) newVy = -newVy * 0.8;
+                
+                // Clamp position
+                newX = Math.max(0, Math.min(100, newX));
+                newY = Math.max(0, Math.min(100, newY));
+
+                // Apply some damping
+                newVx *= 0.99;
+                newVy *= 0.99;
 
                 return { ...p, x: newX, y: newY, vx: newVx, vy: newVy };
-            })
-        );
+            });
+        });
         animationFrameId.current = requestAnimationFrame(animateParticles);
     };
 
@@ -60,13 +91,13 @@ export function InteractiveExplanation() {
     const handleMouseMove = (e: MouseEvent) => {
       if (!container) return;
       const rect = container.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      mousePosition.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
 
       setParticles(prevParticles =>
         prevParticles.map(p => {
-          const dx = (p.x / 100) * rect.width - mouseX;
-          const dy = (p.y / 100) * rect.height - mouseY;
+          if (!mousePosition.current.x || !mousePosition.current.y) return p;
+          const dx = (p.x / 100) * rect.width - mousePosition.current.x;
+          const dy = (p.y / 100) * rect.height - mousePosition.current.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           if (distance < INTERACTION_RADIUS) {
@@ -78,6 +109,7 @@ export function InteractiveExplanation() {
     };
     
     const handleMouseLeave = () => {
+        mousePosition.current = { x: null, y: null };
         setParticles(prev => prev.map(p => ({ ...p, state: 'co2' })));
     };
 
