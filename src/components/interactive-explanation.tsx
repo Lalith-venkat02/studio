@@ -6,13 +6,15 @@ import { Leaf } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 
-const PARTICLE_COUNT = 150;
+const PARTICLE_COUNT = 300;
 const INTERACTION_RADIUS = 80;
 
 interface Particle {
   id: number;
   x: number;
   y: number;
+  vx: number;
+  vy: number;
   state: 'co2' | 'o2';
 }
 
@@ -20,6 +22,7 @@ export function InteractiveExplanation() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [particles, setParticles] = useState<Particle[]>([]);
   const purificationImage = PlaceHolderImages.find(p => p.id === 'purification-cycle');
+  const animationFrameId = useRef<number>();
 
   useEffect(() => {
     const container = containerRef.current;
@@ -29,9 +32,30 @@ export function InteractiveExplanation() {
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
+      vx: (Math.random() - 0.5) * 0.1,
+      vy: (Math.random() - 0.5) * 0.1,
       state: 'co2',
     }));
     setParticles(initialParticles);
+
+    const animateParticles = () => {
+        setParticles(prevParticles => 
+            prevParticles.map(p => {
+                let newX = p.x + p.vx;
+                let newY = p.y + p.vy;
+                let newVx = p.vx;
+                let newVy = p.vy;
+
+                if (newX <= 0 || newX >= 100) newVx = -newVx;
+                if (newY <= 0 || newY >= 100) newVy = -newVy;
+
+                return { ...p, x: newX, y: newY, vx: newVx, vy: newVy };
+            })
+        );
+        animationFrameId.current = requestAnimationFrame(animateParticles);
+    };
+
+    animationFrameId.current = requestAnimationFrame(animateParticles);
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!container) return;
@@ -41,31 +65,32 @@ export function InteractiveExplanation() {
 
       setParticles(prevParticles =>
         prevParticles.map(p => {
-          const particleEl = document.getElementById(`particle-${p.id}`);
-          if (!particleEl) return { ...p, state: 'co2' };
-
-          const particleRect = particleEl.getBoundingClientRect();
-          const particleX = particleRect.left - rect.left + particleRect.width / 2;
-          const particleY = particleRect.top - rect.top + particleRect.height / 2;
-
-          const dx = particleX - mouseX;
-          const dy = particleY - mouseY;
+          const dx = (p.x / 100) * rect.width - mouseX;
+          const dy = (p.y / 100) * rect.height - mouseY;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           if (distance < INTERACTION_RADIUS) {
             return { ...p, state: 'o2' };
           }
-          // Revert to co2 if not in radius
           return { ...p, state: 'co2' };
         })
       );
     };
+    
+    const handleMouseLeave = () => {
+        setParticles(prev => prev.map(p => ({ ...p, state: 'co2' })));
+    };
 
     container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       if (container) {
         container.removeEventListener('mousemove', handleMouseMove);
+        container.removeEventListener('mouseleave', handleMouseLeave);
+      }
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
       }
     };
   }, []);
@@ -106,12 +131,13 @@ export function InteractiveExplanation() {
                 key={particle.id}
                 id={`particle-${particle.id}`}
                 className={cn(
-                  'absolute h-1.5 w-1.5 rounded-full transition-colors duration-200',
-                  particle.state === 'co2' ? 'bg-destructive/70' : 'bg-primary/80'
+                  'absolute h-1 w-1 rounded-full transition-colors duration-200',
+                   particle.state === 'co2' ? 'bg-destructive/70' : 'bg-primary/80'
                 )}
                 style={{
                   left: `${particle.x}%`,
                   top: `${particle.y}%`,
+                  transform: 'translate(-50%, -50%)',
                 }}
               />
             ))}
