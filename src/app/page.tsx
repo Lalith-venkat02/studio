@@ -3,11 +3,31 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import GreonLogo from '@/components/greon-logo';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Waves, Leaf, Wind } from 'lucide-react';
 import { InteractiveExplanation } from '@/components/interactive-explanation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'hero-image');
+
+  const howItWorksSteps = [
+    {
+      icon: Waves,
+      title: '1. Air Intake',
+      description: 'GREON units draw in ambient air from the room, capturing pollutants, dust, and excess CO₂.',
+    },
+    {
+      icon: Leaf,
+      title: '2. Algae Photosynthesis',
+      description: 'Inside the unit, our proprietary microalgae bio-reactor uses photosynthesis to metabolize CO₂ and other contaminants, just like plants in nature.',
+    },
+    {
+      icon: Wind,
+      title: '3. Oxygen Release',
+      description: 'The system releases purified, oxygen-rich air back into your space, creating a healthier and more refreshing environment.',
+    },
+  ];
+
 
   return (
     <div className="flex flex-col min-h-dvh bg-background">
@@ -59,6 +79,33 @@ export default function Home() {
           </div>
         </section>
         <InteractiveExplanation />
+        <section className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-primary font-headline">
+                The Science Behind GREON
+              </h2>
+              <p className="max-w-[900px] text-foreground/80 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Our system harnesses the power of nature, simplified into three core steps.
+              </p>
+            </div>
+            <div className="grid gap-8 md:grid-cols-3">
+              {howItWorksSteps.map((step) => (
+                <Card key={step.title} className="bg-card">
+                  <CardHeader className="items-center text-center">
+                    <div className="p-4 bg-primary/10 rounded-full mb-4">
+                      <step.icon className="h-8 w-8 text-primary" />
+                    </div>
+                    <CardTitle>{step.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-center text-muted-foreground">
+                    <p>{step.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-muted-foreground">&copy; 2024 GREON Inc. All rights reserved.</p>
