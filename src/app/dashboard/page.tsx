@@ -30,7 +30,7 @@ export default function DashboardPage() {
                 <StatCard title="CO₂ Concentration" value={`${latestData.co2} ppm`} icon={Leaf} description="Live Reading" />
                 <StatCard title="Oxygen Level" value={`${latestData.o2} %`} icon={Wind} description="Live Reading" />
                 <StatCard title="CO₂ Absorbed Today" value={`${dailyAbsorption[dailyAbsorption.length - 1].absorbedGrams} g`} icon={BarChart} description="Total for Today" />
-                <StatCard title="Total CO₂ Absorbed" value={`${totalCo2Absorbed} kg`} icon={Clock} description={`Since ${currentUnit.installationDate}`} />
+                <StatCard title="Total CO₂ Absorbed" value={`${totalCo2Absorbed} kg`} icon={Clock} description="Total since installation" />
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <div className="lg:col-span-5">
