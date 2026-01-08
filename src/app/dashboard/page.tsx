@@ -15,7 +15,8 @@ export default function DashboardPage() {
     const latestData = sensorData[sensorData.length - 1];
     
     const totalCo2Absorbed = getTotalCO2Absorbed(currentUnit.installationDate);
-    const purifiedAir = (totalCo2Absorbed * 509).toLocaleString(); // 1g CO2 is approx 509 liters volume
+    const totalCo2AbsorbedAllTime = (new Date().getTime() - new Date(currentUnit.installationDate).getTime()) / (1000 * 3600 * 24) * 20 / 1000;
+    const purifiedAir = (totalCo2AbsorbedAllTime * 1000 * 509).toLocaleString(); // 1g CO2 is approx 509 liters volume
 
     const barChartConfig = {
       absorbedGrams: {
@@ -30,7 +31,7 @@ export default function DashboardPage() {
                 <StatCard title="CO₂ Concentration" value={`${latestData.co2} ppm`} icon={Leaf} description="Live Reading" />
                 <StatCard title="Oxygen Level" value={`${latestData.o2} %`} icon={Wind} description="Live Reading" />
                 <StatCard title="CO₂ Absorbed Today" value={`${dailyAbsorption[dailyAbsorption.length - 1].absorbedGrams} g`} icon={BarChart} description="Total for Today" />
-                <StatCard title="Total CO₂ Absorbed" value={`${totalCo2Absorbed} kg`} icon={Clock} description="Total since installation" />
+                <StatCard title="Total CO₂ Absorbed" value={`${totalCo2Absorbed} kg`} icon={Clock} description="In the last 7 days" />
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <div className="lg:col-span-5">
@@ -96,7 +97,7 @@ export default function DashboardPage() {
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">Equivalent to planting</p>
-                                <p className="text-2xl font-bold">{(totalCo2Absorbed / 21).toFixed(0)} Trees</p>
+                                <p className="text-2xl font-bold">{(totalCo2AbsorbedAllTime / 21).toFixed(0)} Trees</p>
                                 <p className="text-xs text-muted-foreground">(based on an average tree absorbing 21kg CO₂/year)</p>
                             </div>
                         </div>

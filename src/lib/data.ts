@@ -88,9 +88,11 @@ export const generateDailyAbsorption = (days: number): DailyAbsorption[] => {
 };
 
 export const getTotalCO2Absorbed = (installationDate: string): number => {
-    const daysSinceInstallation = (new Date().getTime() - new Date(installationDate).getTime()) / (1000 * 3600 * 24);
-    // Average 20g per day
-    return parseFloat((daysSinceInstallation * 20).toFixed(2));
+    // For demo purposes, let's show a weekly absorption rate.
+    // Average 20g per day * 7 days = 140g. Convert to kg.
+    const weeklyAbsorptionGrams = 140;
+    const randomFactor = 1 + (Math.random() - 0.5) * 0.1; // Add +/- 10% variance
+    return parseFloat(((weeklyAbsorptionGrams * randomFactor) / 1000).toFixed(2));
 }
 
 export const mockMaintenanceTickets: MaintenanceTicket[] = [
